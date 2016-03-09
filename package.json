@@ -6,7 +6,7 @@
     "mongodb": "^2.1.7"
   },
   "scripts": {
-    "test": "mocha test/* --harmony && npm run lint",
+    "test": "mocha --timeout 10000 test/* --harmony && npm run lint",
     "lint": "jscs ."
   },
   "devDependencies": {
