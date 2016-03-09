@@ -1,9 +1,16 @@
 {
   "private": true,
   "dependencies": {
-    "jscs": "2.2.1"
+    "co": "^4.6.0",
+    "jscs": "2.2.1",
+    "mongodb": "^2.1.7"
   },
   "scripts": {
+    "test": "mocha test/* --harmony && npm run lint",
     "lint": "jscs ."
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5"
   }
 }
