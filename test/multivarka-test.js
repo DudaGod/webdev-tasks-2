@@ -10,7 +10,7 @@ const Multivarka = require('../src/multivarka');
 let multivarka = new Multivarka();
 const jsonDir = path.join(__dirname, '..', 'students.json');
 const students = JSON.parse(fs.readFileSync(jsonDir).toString());
-const url = 'mongodb://localhost/urfu-2015';
+const url = 'mongodb://urfu2015:footprint@ds054128.mlab.com:54128/urfu-2015';
 const collectionName = 'students';
 
 let groupName = 'ПИ-301';

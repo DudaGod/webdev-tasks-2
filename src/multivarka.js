@@ -15,7 +15,7 @@ function Multivarka() {
 Multivarka.prototype = {
     server: function (url) {
         this._url = url || 'mongodb://localhost/urfu-2015';
-        if (!(/^mongodb:\/\/localhost\/.+/i.test(this._url))) {
+        if (!(/^mongodb:\/\/.+/i.test(this._url))) {
             throw new RangeError('Incorrect url, url should be determined like - ' +
                 'mongodb://localhost/...');
         }
