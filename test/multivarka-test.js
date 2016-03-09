@@ -3,11 +3,13 @@
 require('chai').should();
 const expect = require('chai').expect;
 const fs = require('fs');
+const path = require('path');
 const MongoClient = require('mongodb').MongoClient;
 const Multivarka = require('../src/multivarka');
 
 let multivarka = new Multivarka();
-const students = JSON.parse(fs.readFileSync('../students.json').toString());
+const jsonDir = path.join(__dirname, '..', 'students.json');
+const students = JSON.parse(fs.readFileSync(jsonDir).toString());
 const url = 'mongodb://localhost/urfu-2015';
 const collectionName = 'students';
 
@@ -168,20 +170,28 @@ describe('Multivarka interface', function () {
     groupName = 'ПИ-666';
     gradeNum = 1;
 
-    it('should update student data', function (done) {
+    it('should update data of a student', function (done) {
         multivarka
             .where('group').equal('ПИ-302')
             .setValue('group', groupName)
             .setValue('stage', gradeNum)
             .update(true)
                 .then(actual => {
-                    const expectedCount = students.filter(item =>
-                        !(groupNames.indexOf(item.group) + 1)).length;
-                    actual.length.should.be.equal(expectedCount);
-                    actual.forEach(item => {
-                        expect(item).to.include.keys('group');
-                        expect(groupNames).to.not.include(item.group);
-                    });
+                    const expectedCount = students.filter(item => item.group === 'ПИ-302').length;
+                    actual.modifiedCount.should.be.equal(expectedCount);
+                })
+                .then(done, done);
+    });
+
+    gradeNum = 5;
+
+    it('should remove data of a student', function (done) {
+        multivarka
+            .where('grade').equal(gradeNum)
+            .remove(true)
+                .then(actual => {
+                    const expectedCount = students.filter(item => item.grade === gradeNum).length;
+                    actual.deletedCount.should.be.equal(expectedCount);
                 })
                 .then(done, done);
     });
