@@ -26,9 +26,6 @@ describe('Multivarka interface', () => {
         const db = yield MongoClient.connect(url);
         db.collection(collectionName).drop();
         db.close();
-    });
-
-    before(() => {
         multivarka.server(url)
             .collection(collectionName);
     });
@@ -44,8 +41,9 @@ describe('Multivarka interface', () => {
             .where('grade')
             .lessThan(grade)
             .find();
-        const expectedCount = students.filter(item => (item.grade > grade2 &&
-            item.grade < grade)).length;
+        const expectedCount = students
+            .filter(item => (item.grade > grade2 && item.grade < grade))
+            .length;
         actual.length.should.be.equal(expectedCount);
         actual.forEach(item => {
             expect(item).to.include.keys('grade');
