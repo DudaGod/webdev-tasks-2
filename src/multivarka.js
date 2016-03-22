@@ -6,10 +6,9 @@ const co = require('co');
 function Multivarka() {
     this._url = '';
     this._collectionName = '';
-    this._field = '';
-    this._isNegative = false;
-    this._query = {};
-    this._set = {$set: {}};
+    this._db = '';
+    this._dbCollection = '';
+    this._reset();
 }
 
 Multivarka.prototype = {
@@ -64,9 +63,9 @@ Multivarka.prototype = {
     },
     update: function (isMany, isUpsert) {
         return this._connect(col => {
-            const upsert = isUpsert ? {upsert: true} : {upsert: false};
-            return isMany ? col.updateMany(this._query, this._set, upsert) :
-                col.updateOne(this._query, this._set, upsert);
+            const options = isUpsert ? {upsert: true} : {};
+            return isMany ? col.updateMany(this._query, this._set, options) :
+                col.updateOne(this._query, this._set);
         });
     },
     remove: function (isMany) {
@@ -79,7 +78,18 @@ Multivarka.prototype = {
             throw new ReferenceError('You should call a where method with field name, ' +
                 'before your query method');
         }
-        this._query[this._field] = value;
+        if (Object.keys(this._query).length) {
+            let furtherQuery = {};
+            furtherQuery[this._field] = value;
+            this._query.hasOwnProperty('$and') ? this._query['$and'].push(furtherQuery) :
+                () => {
+                    let arr = [this._query];
+                    arr.push(furtherQuery);
+                    this._query = {$and: arr};
+                }();
+        } else {
+            this._query[this._field] = value;
+        }
         return this;
     },
     _reset: function () {
@@ -89,17 +99,15 @@ Multivarka.prototype = {
         this._set = {$set: {}};
     },
     _connect: function (crudFunc) {
-        let db;
         return co(function *() {
-            db = yield MongoClient.connect(this._url);
-            const collection = db.collection(this._collectionName);
-            return yield crudFunc(collection);
-        }.bind(this))
-        .then(result => {
-            db.close();
+            if (!this._db) {
+                this._db = yield MongoClient.connect(this._url);
+                this._dbCollection = this._db.collection(this._collectionName);
+            }
+            const result = yield crudFunc(this._dbCollection);
             this._reset();
             return result;
-        });
+        }.bind(this));
     }
 };
 
