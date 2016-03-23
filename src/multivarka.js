@@ -81,12 +81,13 @@ Multivarka.prototype = {
         if (Object.keys(this._query).length) {
             let furtherQuery = {};
             furtherQuery[this._field] = value;
-            this._query.hasOwnProperty('$and') ? this._query['$and'].push(furtherQuery) :
-                () => {
-                    let arr = [this._query];
-                    arr.push(furtherQuery);
-                    this._query = {$and: arr};
-                }();
+            if (this._query.hasOwnProperty('$and')) {
+                this._query['$and'].push(furtherQuery);
+            } else {
+                let arr = [this._query];
+                arr.push(furtherQuery);
+                this._query = {$and: arr};
+            }
         } else {
             this._query[this._field] = value;
         }
